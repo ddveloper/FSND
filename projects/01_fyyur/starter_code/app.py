@@ -13,6 +13,7 @@ from logging import Formatter, FileHandler
 from flask_wtf import Form
 from flask_migrate import Migrate
 from forms import *
+import sys
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -231,15 +232,46 @@ def create_venue_form():
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-  # TODO: insert form data as a new Venue record in the db, instead
-  # TODO: modify data to be the data object returned from db insertion
+  error = 0
+  try:
+    name = request.form['name']
+    city = request.form['city']
+    state = request.form['state']
+    address = request.form['address']
+    phone = request.form['phone']
+    image_link = request.form['image_link']
+    facebook_link = request.form['facebook_link']
+    website = request.form['website']
+    genres = ','.join(request.form.getlist('genres'))
+    seeking_talent = 'seeking_talent' in request.form and request.form['seeking_talent'] == 'y'
+    seeking_description = request.form['seeking_description']
 
-  # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  return render_template('pages/home.html')
+    item = Venue.query.filter_by(name=name).all()
+    if len(item): error = 1 # Venue already exists!
+    else:
+      item = Venue(name=name, city=city, state=state, address=address, phone=phone,
+                  image_link=image_link, facebook_link=facebook_link, website=website,
+                  genres=genres, seeking_talent=seeking_talent, seeking_description=seeking_description)
+      db.session.add(item)
+      db.session.commit()
+  except:
+    error = 4
+    db.session.rollback()
+    print(sys.exc_info())
+  finally:
+    db.session.close()
+
+  if error == 1:
+    flash('An error occurred. Venue ' + request.form['name'] + ' already exists.')
+  elif error:
+    flash('An error occurred. Venue ' + request.form['name'] + ' could not be listed.')
+  else:
+    flash('Venue ' + request.form['name'] + ' was successfully listed!')
+
+  if error:
+    return redirect(url_for('create_venue_submission'))
+  else:
+    return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
