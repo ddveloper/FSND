@@ -3,7 +3,7 @@ from sqlalchemy import Column, String, Integer, create_engine
 from flask_sqlalchemy import SQLAlchemy
 import json
 
-database_name = "trivia"
+database_name = "trivia_test"
 database_path = "postgresql://postgres:postgres@{}/{}".format('localhost:5432', database_name)
 
 db = SQLAlchemy()
@@ -48,6 +48,10 @@ class Question(db.Model):
   def delete(self):
     db.session.delete(self)
     db.session.commit()
+
+  def get_last_id(self):
+    db.session.refresh(self)
+    return self.id
 
   def format(self):
     return {
