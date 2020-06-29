@@ -107,7 +107,7 @@ class TriviaTestCase(unittest.TestCase):
         
     # test query questions based on category fail
     def test_404_for_fail_query(self):
-        res = self.client().post('/questions?category=1000')
+        res = self.client().get('/categories/1000/questions')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 400)
@@ -116,7 +116,7 @@ class TriviaTestCase(unittest.TestCase):
         
     # test query questions based on category pass
     def test_query_questions_by_category(self):
-        res = self.client().post('/questions?category=4')
+        res = self.client().get('/categories/4/questions')
         data = json.loads(res.data)
         
         self.assertEqual(res.status_code, 200)

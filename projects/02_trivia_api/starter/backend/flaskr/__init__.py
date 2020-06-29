@@ -47,6 +47,20 @@ def create_app(test_config=None):
       'categories': {category.id: category.type for category in categories}
     })
 
+  @app.route('/categories/<int:category_id>/questions', methods=['GET'])
+  def get_questions_by_category(category_id):
+    categories = Category.query.all()
+    if category_id not in [category.id for category in categories]:
+      abort(400, 'category number not found')
+
+    questions = Question.query.filter_by(category=category_id).all()
+    formatted_questions = [question.format() for question in questions]
+    return jsonify({
+      'success': True,
+      'questions': formatted_questions,
+      'current_category': category_id
+    })
+
   @app.route('/questions/add', methods=['POST'])
   def add_question():
     body = request.get_json()
