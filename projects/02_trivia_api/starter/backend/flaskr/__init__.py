@@ -47,6 +47,17 @@ def create_app(test_config=None):
       'categories': {category.id: category.type for category in categories}
     })
 
+  @app.route('/questions/search', methods=['POST'])
+  def search_questions():    
+    body = request.get_json()
+    search_term = body.get('searchTerm', None)
+    questions = Question.query.filter(Question.question.ilike(r'%{}%'.format(search_term))).all()
+    formatted_questions = [question.format() for question in questions]
+    return jsonify({
+      'success': True,
+      'questions': formatted_questions
+    })
+
   @app.route('/categories/<int:category_id>/questions', methods=['GET'])
   def get_questions_by_category(category_id):
     categories = Category.query.all()

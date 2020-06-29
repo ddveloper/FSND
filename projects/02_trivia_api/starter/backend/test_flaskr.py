@@ -126,7 +126,7 @@ class TriviaTestCase(unittest.TestCase):
         
     # test query questions based on search term empty
     def test_query_questions_by_search_empty(self):
-        res = self.client().post('/questions/search', json={searchTerm: 'blabla'})
+        res = self.client().post('/questions/search', json={'searchTerm': 'blabla'})
         data = json.loads(res.data)
         
         self.assertEqual(res.status_code, 200)
@@ -135,7 +135,7 @@ class TriviaTestCase(unittest.TestCase):
         
     # test query questions based on search term exist
     def test_query_questions_by_search_exist(self):
-        res = self.client().post('/questions/search', json={searchTerm: 'what'})
+        res = self.client().post('/questions/search', json={'searchTerm': 'what'})
         data = json.loads(res.data)
         
         self.assertEqual(res.status_code, 200)
