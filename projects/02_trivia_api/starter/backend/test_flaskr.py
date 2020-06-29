@@ -79,11 +79,12 @@ class TriviaTestCase(unittest.TestCase):
         
     # test add question fail
     def test_404_for_fail_add(self):
-        res = self.client().post('/questions', json={
+        res = self.client().post('/questions/add', json={
             'question': "What boxer's original name is Cassius Clay?", 
             'answer': 'ans', 
             'category': 4, 
             'difficulty': 1})
+        data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['success'], False)
@@ -91,7 +92,7 @@ class TriviaTestCase(unittest.TestCase):
         
     # test add question pass
     def test_add_question(self):
-        res = self.client().post('/questions', json={
+        res = self.client().post('/questions/add', json={
             'question': "new question", 
             'answer': 'ans', 
             'category': 4, 
@@ -100,7 +101,6 @@ class TriviaTestCase(unittest.TestCase):
         
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertTrue(data['new_id'].isdigit())
         question = Question.query.filter_by(id=int(data['new_id'])).one_or_none()
         self.assertIsNotNone(question)
         question.delete()

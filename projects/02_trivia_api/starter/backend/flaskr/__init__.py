@@ -47,11 +47,39 @@ def create_app(test_config=None):
       'categories': {category.id: category.type for category in categories}
     })
 
+  @app.route('/questions/add', methods=['POST'])
+  def add_question():
+    body = request.get_json()
+
+    new_question = body.get('question', None)
+    new_answer = body.get('answer', None)
+    new_category = body.get('category', None)
+    new_difficulty = body.get('difficulty', None)
+
+    old_question = Question.query.filter_by(question=new_question) \
+                    .filter_by(category=new_category).one_or_none()
+    if old_question is not None:
+      abort(400, 'question already exists')
+
+    try:
+      question = Question(question=new_question, answer=new_answer, 
+                    category=new_category, difficulty=new_difficulty)
+      question.insert()
+      new_id = question.get_last_id()
+      return jsonify({
+        'success': True,
+        'new_id': new_id
+      })
+    except:
+      flash('An error occur when adding new question')
+      abort(500, 'failed to add new question')
+      print(sys.exc_info())
+
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
   def delete_question_by_id(question_id):
     question = Question.query.filter_by(id=question_id).first()
     if question is None:
-      abort(404)
+      abort(400, 'question number not found')
 
     try:
       question.delete()
@@ -61,7 +89,7 @@ def create_app(test_config=None):
       })
     except:
       flash('An error occur when deleting question {}'.format(question_id))
-      abort(404)
+      abort(500, 'failed to delete question {}'.format(question_id))
       print(sys.exc_info())
 
   '''
@@ -108,19 +136,33 @@ def create_app(test_config=None):
   and shown whether they were correct or not. 
   '''
 
+  @app.errorhandler(400)
+  def bad_request_error(error):
+    return jsonify({
+      'success': False,
+      'messages': error.description
+    }), 400
+
   @app.errorhandler(404)
   def not_found_error(error):
     return jsonify({
       'success': False,
-      'messages': 'bad request'
+      'messages': error.description
     }), 404
 
   @app.errorhandler(422)
-  def not_found_error(error):
+  def unprocessable_entity_error(error):
     return jsonify({
       'success': False,
-      'messages': 'unprocessable entity'
+      'messages': error.description
     }), 422
+
+  @app.errorhandler(500)
+  def internal_server_error(error):
+    return jsonify({
+      'success': False,
+      'messages': error.description
+    }), 500
   
   return app
 
