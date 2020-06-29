@@ -51,7 +51,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertIsNone(data['current_category'])
 
     # test delete question fail
-    def test_404_for_fail_delete(self):
+    def test_400_for_fail_delete(self):
         res = self.client().delete('/questions/1000')
         data = json.loads(res.data)
 
@@ -78,7 +78,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertIsNone(question)
         
     # test add question fail
-    def test_404_for_fail_add(self):
+    def test_400_for_fail_add(self):
         res = self.client().post('/questions/add', json={
             'question': "What boxer's original name is Cassius Clay?", 
             'answer': 'ans', 
@@ -104,6 +104,26 @@ class TriviaTestCase(unittest.TestCase):
         question = Question.query.filter_by(id=int(data['new_id'])).one_or_none()
         self.assertIsNotNone(question)
         question.delete()
+        
+    # test query questions based on category fail
+    def test_404_for_fail_query(self):
+        res = self.client().post('/questions?category=1000')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['messages'], 'category number not found')
+        
+    # test query questions based on category pass
+    def test_query_questions_by_category(self):
+        res = self.client().post('/questions?category=4')
+        data = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(len(data['questions']), 4)
+        self.assertEqual(data['current_category'], 4)
+
 
 
 # Make the tests conveniently executable
