@@ -133,14 +133,23 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertEqual(len(data['questions']), 0)
         
-    # test query questions based on search term exist
-    def test_query_questions_by_search_exist(self):
-        res = self.client().post('/questions/search', json={'searchTerm': 'what'})
+    # test quiz
+    def test_quiz_get_no_more(self):
+        res = self.client().post('/quiz', json={'previous_questions': [5,12,23,9], 'quiz_category': {'id': 4}})
         data = json.loads(res.data)
         
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(len(data['questions']), 8)
+        self.assertEqual(len(data['question']), 0)
+        
+    # test quiz
+    def test_quiz_ok(self):
+        res = self.client().post('/quiz', json={'previous_questions': [4,6,10,9], 'quiz_category': {'id': 4}})
+        data = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(len(data['question']), 1)
 
 
 
