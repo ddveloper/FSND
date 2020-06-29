@@ -133,6 +133,14 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertEqual(len(data['questions']), 0)
         
+    # test quiz bad category
+    def test_400_quiz_bad_category(self):
+        res = self.client().post('/quiz', json={'previous_questions': [5,12,23,9], 'quiz_category': {'id': 1000}})
+        data = json.loads(res.data)
+        
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['messages'], 'category number not found')
+        
     # test quiz
     def test_quiz_get_no_more(self):
         res = self.client().post('/quiz', json={'previous_questions': [5,12,23,9], 'quiz_category': {'id': 4}})
@@ -140,7 +148,7 @@ class TriviaTestCase(unittest.TestCase):
         
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(len(data['question']), 0)
+        self.assertEqual(len(data['questions']), 0)
         
     # test quiz
     def test_quiz_ok(self):
@@ -149,7 +157,7 @@ class TriviaTestCase(unittest.TestCase):
         
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(len(data['question']), 1)
+        self.assertEqual(len(data['questions']), 1)
 
 
 

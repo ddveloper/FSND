@@ -47,6 +47,26 @@ def create_app(test_config=None):
       'categories': {category.id: category.type for category in categories}
     })
 
+  @app.route('/quiz', methods=['POST'])
+  def quiz():    
+    body = request.get_json()
+    previous_questions = body.get('previous_questions', [])
+    quiz_category = body.get('quiz_category', None)
+    categories = Category.query.all()
+    if quiz_category['id'] not in [category.id for category in categories]:
+      abort(400, 'category number not found')
+
+    questions = Question.query.filter_by(category=quiz_category['id']).all()
+    filtered_questions = []
+    for question in questions:
+      if question.id not in previous_questions:
+        filtered_questions.append(question)
+    random_question = [] if len(filtered_questions) == 0 else [random.choice(filtered_questions).format()]
+    return jsonify({
+      'success': True,
+      'questions': random_question
+    })
+
   @app.route('/questions/search', methods=['POST'])
   def search_questions():    
     body = request.get_json()
