@@ -63,7 +63,7 @@ def create_app(test_config=None):
     # return questions list having category id == input id
     categories = Category.query.all()
     if category_id not in [category.id for category in categories]:
-      abort(400, 'category number not found')
+      abort(404, 'category number not found')
 
     questions = Question.query.filter_by(category=category_id).all()
     formatted_questions = [question.format() for question in questions]
@@ -110,7 +110,7 @@ def create_app(test_config=None):
     # delete question based on input question id (same as id in DB)
     question = Question.query.filter_by(id=question_id).first()
     if question is None:
-      abort(400, 'question number not found')
+      abort(404, 'question number not found')
 
     try:
       question.delete()
@@ -132,7 +132,7 @@ def create_app(test_config=None):
     categories = Category.query.all()
     quiz_category_id = int(quiz_category['id'])
     if quiz_category_id != 0 and quiz_category_id not in [category.id for category in categories]:
-      abort(400, 'category number not found')
+      abort(422, 'quiz_category is invalid')
 
     questions = Question.query.all() if quiz_category_id == 0 else Question.query.filter_by(category=quiz_category['id']).all()
     filtered_questions = []

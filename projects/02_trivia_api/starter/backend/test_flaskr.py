@@ -51,11 +51,11 @@ class TriviaTestCase(unittest.TestCase):
         self.assertIsNone(data['current_category'])
 
     # test delete question fail
-    def test_400_for_fail_delete(self):
+    def test_404_for_fail_delete(self):
         res = self.client().delete('/questions/1000')
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['messages'], 'question number not found')
         
@@ -109,7 +109,7 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().get('/categories/1000/questions')
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['messages'], 'category number not found')
         
@@ -133,12 +133,12 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(len(data['questions']), 0)
         
     # test quiz bad category
-    def test_400_quiz_bad_category(self):
+    def test_422_quiz_bad_category(self):
         res = self.client().post('/quizzes', json={'previous_questions': [5,12,23,9], 'quiz_category': {'id': '1000'}})
         data = json.loads(res.data)
         
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['messages'], 'category number not found')
+        self.assertEqual(data['messages'], 'quiz_category is invalid')
         
     # test quiz
     def test_quiz_get_no_more(self):
