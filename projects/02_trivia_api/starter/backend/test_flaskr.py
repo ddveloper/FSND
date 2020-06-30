@@ -82,13 +82,12 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().post('/questions/add', json={
             'question': "What boxer's original name is Cassius Clay?", 
             'answer': 'ans', 
-            'category': 4, 
-            'difficulty': 1})
+            'category': 4})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['messages'], 'question already exists')
+        self.assertEqual(data['messages'], 'invalid inputs of the new question')
         
     # test add question pass
     def test_add_question(self):

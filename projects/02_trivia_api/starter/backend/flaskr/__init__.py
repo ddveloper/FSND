@@ -83,10 +83,13 @@ def create_app(test_config=None):
     new_category = body.get('category', None)
     new_difficulty = body.get('difficulty', None)
 
-    old_question = Question.query.filter_by(question=new_question) \
-                    .filter_by(category=new_category).one_or_none()
-    if old_question is not None:
-      abort(400, 'question already exists')
+    # old_question = Question.query.filter_by(question=new_question) \
+    #                 .filter_by(category=new_category).one_or_none()
+    # if old_question is not None:
+    #   abort(400, 'question already exists')
+
+    if not new_question or not new_answer or not new_category or not new_difficulty:
+      abort(400, 'invalid inputs of the new question')
 
     try:
       question = Question(question=new_question, answer=new_answer, 
