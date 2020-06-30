@@ -22,6 +22,7 @@ def create_app(test_config=None):
 
   @app.route('/categories', methods=['GET'])
   def get_categories():
+    # return all categories
     categories = Category.query.all()
     return jsonify({
       'success': True,
@@ -30,6 +31,7 @@ def create_app(test_config=None):
 
   @app.route('/questions', methods=['GET'])
   def get_questions():
+    # return paginated questions list
     page = request.args.get('page', 1, type=int)
     start = (page-1) * QUESTIONS_PER_PAGE
     end = start + QUESTIONS_PER_PAGE
@@ -44,30 +46,9 @@ def create_app(test_config=None):
       'categories': {category.id: category.type for category in categories}
     })
 
-  @app.route('/quizzes', methods=['POST'])
-  def quiz():    
-    body = request.get_json()
-    previous_questions = body.get('previous_questions', [])
-    quiz_category = body.get('quiz_category', None)
-    categories = Category.query.all()
-    quiz_category_id = int(quiz_category['id'])
-    if quiz_category_id != 0 and quiz_category_id not in [category.id for category in categories]:
-      abort(400, 'category number not found')
-
-    questions = Question.query.all() if quiz_category_id == 0 else Question.query.filter_by(category=quiz_category['id']).all()
-    filtered_questions = []
-    for question in questions:
-      if question.id not in previous_questions:
-        filtered_questions.append(question)
-    random_question = None if len(filtered_questions) == 0 else random.choice(filtered_questions).format()
-    #print(random_question)
-    return jsonify({
-      'success': True,
-      'question': random_question
-    })
-
   @app.route('/questions/search', methods=['POST'])
   def search_questions():    
+    # return questions list based on search term
     body = request.get_json()
     search_term = body.get('searchTerm', None)
     questions = Question.query.filter(Question.question.ilike(r'%{}%'.format(search_term))).all()
@@ -79,6 +60,7 @@ def create_app(test_config=None):
 
   @app.route('/categories/<int:category_id>/questions', methods=['GET'])
   def get_questions_by_category(category_id):
+    # return questions list having category id == input id
     categories = Category.query.all()
     if category_id not in [category.id for category in categories]:
       abort(400, 'category number not found')
@@ -93,6 +75,7 @@ def create_app(test_config=None):
 
   @app.route('/questions/add', methods=['POST'])
   def add_question():
+    # add a new question into database
     body = request.get_json()
 
     new_question = body.get('question', None)
@@ -121,6 +104,7 @@ def create_app(test_config=None):
 
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
   def delete_question_by_id(question_id):
+    # delete question based on input question id (same as id in DB)
     question = Question.query.filter_by(id=question_id).first()
     if question is None:
       abort(400, 'question number not found')
@@ -136,6 +120,28 @@ def create_app(test_config=None):
       abort(500, 'failed to delete question {}'.format(question_id))
       print(sys.exc_info())
 
+  @app.route('/quizzes', methods=['POST'])
+  def quiz():    
+    # return questions based on quiz status from frontend
+    body = request.get_json()
+    previous_questions = body.get('previous_questions', [])
+    quiz_category = body.get('quiz_category', None)
+    categories = Category.query.all()
+    quiz_category_id = int(quiz_category['id'])
+    if quiz_category_id != 0 and quiz_category_id not in [category.id for category in categories]:
+      abort(400, 'category number not found')
+
+    questions = Question.query.all() if quiz_category_id == 0 else Question.query.filter_by(category=quiz_category['id']).all()
+    filtered_questions = []
+    for question in questions:
+      if question.id not in previous_questions:
+        filtered_questions.append(question)
+    random_question = None if len(filtered_questions) == 0 else random.choice(filtered_questions).format()
+    #print(random_question)
+    return jsonify({
+      'success': True,
+      'question': random_question
+    })
 
   @app.errorhandler(400)
   def bad_request_error(error):

@@ -124,7 +124,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(len(data['questions']), 4)
         self.assertEqual(data['current_category'], 4)
         
-    # test query questions based on search term empty
+    # test query questions based on search term, result is empty
     def test_query_questions_by_search_empty(self):
         res = self.client().post('/questions/search', json={'searchTerm': 'blabla'})
         data = json.loads(res.data)

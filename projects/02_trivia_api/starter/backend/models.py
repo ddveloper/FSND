@@ -49,6 +49,7 @@ class Question(db.Model):
     db.session.delete(self)
     db.session.commit()
 
+  # add this method for retrieving last added question id
   def get_last_id(self):
     db.session.refresh(self)
     return self.id
