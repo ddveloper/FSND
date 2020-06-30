@@ -60,7 +60,7 @@ def create_app(test_config=None):
       if question.id not in previous_questions:
         filtered_questions.append(question)
     random_question = None if len(filtered_questions) == 0 else random.choice(filtered_questions).format()
-    print(random_question)
+    #print(random_question)
     return jsonify({
       'success': True,
       'question': random_question
