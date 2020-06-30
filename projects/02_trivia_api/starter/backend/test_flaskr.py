@@ -135,7 +135,7 @@ class TriviaTestCase(unittest.TestCase):
         
     # test quiz bad category
     def test_400_quiz_bad_category(self):
-        res = self.client().post('/quiz', json={'previous_questions': [5,12,23,9], 'quiz_category': {'id': 1000}})
+        res = self.client().post('/quizzes', json={'previous_questions': [5,12,23,9], 'quiz_category': {'id': '1000'}})
         data = json.loads(res.data)
         
         self.assertEqual(data['success'], False)
@@ -143,24 +143,38 @@ class TriviaTestCase(unittest.TestCase):
         
     # test quiz
     def test_quiz_get_no_more(self):
-        res = self.client().post('/quiz', json={'previous_questions': [5,12,23,9], 'quiz_category': {'id': 4}})
+        res = self.client().post('/quizzes', json={'previous_questions': [5,12,23,9], 'quiz_category': {'id': '4'}})
         data = json.loads(res.data)
         
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(len(data['questions']), 0)
+        self.assertIsNone(data['question'])
         
     # test quiz
     def test_quiz_ok(self):
-        res = self.client().post('/quiz', json={'previous_questions': [4,6,10,9], 'quiz_category': {'id': 4}})
+        res = self.client().post('/quizzes', json={'previous_questions': [4,6,10,9], 'quiz_category': {'id': '4'}})
         data = json.loads(res.data)
         
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(len(data['questions']), 1)
+        self.assertIsNotNone(data['question'])
 
 
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
+
+    # app = create_app()
+    # #self.client = self.app.test_client
+    # database_name = "trivia_test"
+    # database_path = "postgresql://postgres:postgres@{}/{}".format('localhost:5432', database_name)
+    # setup_db(app, database_path)
+
+    # # binds the app to the current context
+    # with app.app_context():
+    #     db = SQLAlchemy()
+    #     db.init_app(app)
+    #     # create all tables
+    #     db.create_all()
+    # app.run()
