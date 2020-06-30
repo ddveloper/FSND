@@ -178,10 +178,10 @@ GET '/categories'
 ```
   {
     '1' : "Science",
-'2' : "Art",
-'3' : "Geography",
-'4' : "History",
-'5' : "Entertainment",
+    '2' : "Art",
+    '3' : "Geography",
+    '4' : "History",
+    '5' : "Entertainment",
     '6' : "Sports"
   }
 ```
@@ -276,9 +276,6 @@ POST '/quizzes'
 Dawei Zhang
 ## Acknowledgements
 The awesome team at Udacity and Coach Caryn.
-
-```
-
 
 ## Testing
 To run the tests, run
