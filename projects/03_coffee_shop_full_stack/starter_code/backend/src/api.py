@@ -70,18 +70,13 @@ def add_drinks(payload):
     body = request.get_json()
     title = body['title']
     recipe = body['recipe']
-    if 'color' not in recipe or not isinstance(recipe['color'], str) \
-        or 'name' not in recipe or not isinstance(recipe['name'], str) \
-        or 'parts' not in recipe or not isinstance(recipe['parts'], int):
-        flash('Invalid inputs to create new drink')
-        abort(400, 'Invalid inputs to create new drink')
     old_drink = Drink.query.filter_by(title=title).one_or_none()
     if old_drink:
         flash('Drink with same title already exist')
         abort(400, 'Drink with same title already exist')
 
     try:
-        drink = Drink(title=title, recipe='['+json.dumps(recipe)+']')
+        drink = Drink(title=title, recipe=json.dumps(recipe))
         drink.insert()
         formatted_drinks = [drink.long()]
         return jsonify({
@@ -117,7 +112,7 @@ def update_drinks(payload, drink_id):
             flash('internal error: drink not found!')
             abort(404, 'internal error: drink not found!')
         if title: drink.title = title
-        if recipe: drink.recipe = recipe
+        if recipe: drink.recipe = json.dumps(recipe)
         drink.update()
         return jsonify({
             'success': True,
