@@ -11,7 +11,7 @@ from .auth.auth import AuthError, requires_auth
 app = Flask(__name__)
 app.secret_key = 'some secret key'
 setup_db(app)
-CORS(app)
+# CORS(app, resources={r"/drinks*": {"origins": "*"}})
 
 '''
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
@@ -25,7 +25,8 @@ CORS(app)
 def get_drinks():
     '''
         GET /drinks
-        returns status code 200 and json {"success": True, "drinks": drinks}
+        inputs:  None
+        returns: status code 200 and json {"success": True, "drinks": drinks}
             where drinks is the list of drinks
             or appropriate status code indicating reason for failure
     '''
@@ -43,7 +44,8 @@ def get_drink_details(payload):
     '''
         GET /drinks-detail
             require the 'get:drinks-detail' permission
-        returns status code 200 and json {"success": True, "drinks": drinks}
+        inputs:  None
+        returns: status code 200 and json {"success": True, "drinks": drinks}
             where drinks is the list of drinks
             or appropriate status code indicating reason for failure
     '''
@@ -61,7 +63,8 @@ def add_drinks(payload):
     '''
         POST /drinks
             require the 'post:drinks' permission
-        returns status code 200 and json {"success": True, "drinks": drink}
+        inputs:  None
+        returns: status code 200 and json {"success": True, "drinks": drink}
             where drink an array containing only the newly created drink
             or appropriate status code indicating reason for failure
     '''
@@ -91,9 +94,9 @@ def add_drinks(payload):
 @requires_auth('patch:drinks')
 def update_drinks(payload, drink_id):
     '''
-        PATCH /drinks/<id>
-            where <id> is the existing model id
+        PATCH /drinks/<drink_id>
             require the 'patch:drinks' permission
+        inputs:  drink_id, is the existing model id
             respond with a 404 error if <id> is not found
             update the corresponding row for <id>
         returns status code 200 and json {"success": True, "drinks": drink}
@@ -129,8 +132,8 @@ def update_drinks(payload, drink_id):
 def delete_drink(payload, drink_id):
     '''
         DELETE /drinks/<drink_id>
-            where <drink_id> is the existing model id
             require the 'delete:drinks' permission
+        inputs:  drink_id, is the existing model id
             respond with a 404 error if <id> is not found
             delete the corresponding row for <id>
         returns status code 200 and json {"success": True, "delete": id}
